@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Directory - School Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .sidebar {
+            background: white;
+            min-height: calc(100vh - 56px);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+        .sidebar .nav-link {
+            color: #495057;
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover {
+            background: #f8f9fa;
+            color: #667eea;
+            transform: translateX(5px);
+        }
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .employee-card {
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        .employee-card:hover {
+            transform: translateY(-5px);
+        }
+        .employee-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .search-box {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 20px;
+        }
+        .search-box:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'accounts:dashboard' %}">
+                <i class="fas fa-graduation-cap me-2"></i>
+                School Management System
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                <span class="text-white me-3">
+                    <i class="fas fa-user-circle me-2"></i>
+                    {{ user.get_full_name|default:user.username }}
+                </span>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar p-0">
+                <nav class="nav flex-column py-3">
+                    <a class="nav-link" href="{% url 'accounts:dashboard' %}">
+                        <i class="fas fa-home"></i>Dashboard
+                    </a>
+                    <a class="nav-link active" href="{% url 'employees:list' %}">
+                        <i class="fas fa-users"></i>Staff Management
+                    </a>
+                    <a class="nav-link" href="{% url 'employees:leave_requests' %}">
+                        <i class="fas fa-calendar-alt"></i>Leave Requests
+                    </a>
+                    <a class="nav-link" href="{% url 'employees:attendance' %}">
+                        <i class="fas fa-clock"></i>Attendance
+                    </a>
+                    <a class="nav-link" href="{% url 'employees:performance_reviews' %}">
+                        <i class="fas fa-star"></i>Performance
+                    </a>
+                    <hr class="my-2">
+                    <a class="nav-link" href="{% url 'accounts:profile' %}">
+                        <i class="fas fa-user-circle"></i>My Profile
+                    </a>
+                    <a class="nav-link" href="/admin/">
+                        <i class="fas fa-cog"></i>Admin Panel
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-4">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2><i class="fas fa-users me-2"></i>Staff Directory</h2>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Staff Directory</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <a href="{% url 'employees:create' %}" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>Add New Staff
+                    </a>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="get" class="row g-3">
+                            <div class="col-md-6">
+                                <input type="text" name="search" class="form-control search-box" 
+                                       placeholder="Search by name, ID, or department..." 
+                                       value="{{ search_query }}">
+                            </div>
+                            <div class="col-md-3">
+                                <select name="department" class="form-select">
+                                    <option value="">All Departments</option>
+                                    {% for dept in departments %}
+                                        <option value="{{ dept.id }}" {% if department_filter == dept.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ dept.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <h3>{{ total_employees }}</h3>
+                                <p class="mb-0">Total Staff Members</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h3>{{ page_obj.paginator.count|default:total_employees }}</h3>
+                                <p class="mb-0">Showing Results</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h3>{{ departments.count }}</h3>
+                                <p class="mb-0">Departments</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee List -->
+                {% if page_obj %}
+                    <div class="row g-4">
+                        {% for employee in page_obj %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card employee-card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <div class="employee-avatar bg-primary bg-opacity-10 text-primary me-3">
+                                            {{ employee.user.first_name.0 }}{{ employee.user.last_name.0 }}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">{{ employee.user.get_full_name }}</h5>
+                                            <p class="text-muted small mb-0">
+                                                <i class="fas fa-id-badge me-1"></i>{{ employee.employee_id }}
+                                            </p>
+                                        </div>
+                                        {% if employee.employment_status == 'active' %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ employee.employment_status|title }}</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-building me-1"></i>
+                                            {{ employee.department.name|default:"No Department" }}
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-briefcase me-1"></i>
+                                            {{ employee.position.title|default:"No Position" }}
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-envelope me-1"></i>
+                                            {{ employee.user.email }}
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'employees:detail' employee.pk %}" class="btn btn-sm btn-outline-primary flex-grow-1">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                        <a href="{% url 'employees:edit' employee.pk %}" class="btn btn-sm btn-outline-secondary flex-grow-1">
+                                            <i class="fas fa-edit me-1"></i>Edit
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}">
+                                        Previous
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}">
+                                        {{ num }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}">
+                                        Next
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                            <h4>No Staff Members Found</h4>
+                            <p class="text-muted">Start by adding your first staff member</p>
+                            <a href="{% url 'employees:create' %}" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-2"></i>Add First Staff Member
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

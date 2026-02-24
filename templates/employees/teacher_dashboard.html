@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2>Teacher Dashboard</h2>
+            <p class="text-muted">Welcome, {{ user.get_full_name }}!</p>
+            {% if class_name %}
+            <div class="alert alert-info">
+                <strong>Class:</strong> {{ class_name }} | <strong>Submit work to:</strong> {{ submitted_to_name }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total Submissions</h5>
+                    <h2>{{ total_submissions }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>Pending Review</h5>
+                    <h2>{{ pending_submissions }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Approved</h5>
+                    <h2>{{ approved_submissions }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>Quick Action</h5>
+                    <a href="{% url 'employees:submit_work' %}" class="btn btn-light btn-sm mt-2">Submit Work</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Submissions</h5>
+                    <a href="{% url 'employees:submit_work' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> New Submission
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if submissions %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Subject</th>
+                                        <th>Status</th>
+                                        <th>Submitted</th>
+                                        <th>Feedback</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for submission in submissions %}
+                                    <tr>
+                                        <td>{{ submission.title }}</td>
+                                        <td>{{ submission.get_work_type_display }}</td>
+                                        <td>{{ submission.subject|default:"-" }}</td>
+                                        <td>
+                                            {% if submission.status == 'pending' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% elif submission.status == 'approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% elif submission.status == 'rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% else %}
+                                                <span class="badge bg-info">Needs Revision</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ submission.submitted_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if submission.feedback %}
+                                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#feedback{{ submission.id }}">
+                                                    View
+                                                </button>
+                                                
+                                                <div class="modal fade" id="feedback{{ submission.id }}" tabindex="-1">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Feedback</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p><strong>Reviewed by:</strong> {{ submission.reviewed_by.get_full_name }}</p>
+                                                                <p><strong>Date:</strong> {{ submission.reviewed_at|date:"M d, Y H:i" }}</p>
+                                                                <hr>
+                                                                <p>{{ submission.feedback }}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No submissions yet. Click "New Submission" to submit your work.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

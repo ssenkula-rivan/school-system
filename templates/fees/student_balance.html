@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>{{ student.get_full_name }} - Fee Balance</h2>
+    <div class="card mt-3">
+        <div class="card-body">
+            {% if balances %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Fee Structure</th>
+                                <th>Total</th>
+                                <th>Paid</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for balance in balances %}
+                            <tr>
+                                <td>{{ balance.fee_structure }}</td>
+                                <td>${{ balance.total_fee }}</td>
+                                <td class="text-success">${{ balance.amount_paid }}</td>
+                                <td class="text-danger">${{ balance.balance }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No balance records</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}{{ title }} - School Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-user-edit me-2"></i>{{ title }}</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employees:list' %}">Staff</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Staff Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- User Information Section -->
+                        <h6 class="mb-3 text-primary"><i class="fas fa-user me-2"></i>Personal Information</h6>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="id_username" class="form-label">Username <span class="text-danger">*</span></label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="text-danger small">{{ form.username.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="id_first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="id_last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="id_email" class="form-label">Email <span class="text-danger">*</span></label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Employment Information Section -->
+                        <h6 class="mb-3 text-primary"><i class="fas fa-briefcase me-2"></i>Employment Details</h6>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="id_employee_id" class="form-label">Employee ID <span class="text-danger">*</span></label>
+                                {{ form.employee_id }}
+                                {% if form.employee_id.errors %}
+                                    <div class="text-danger small">{{ form.employee_id.errors }}</div>
+                                {% endif %}
+                                <small class="text-muted">{{ form.employee_id.help_text }}</small>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="id_department" class="form-label">Department</label>
+                                {{ form.department }}
+                                {% if form.department.errors %}
+                                    <div class="text-danger small">{{ form.department.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="id_position" class="form-label">Position</label>
+                                {{ form.position }}
+                                {% if form.position.errors %}
+                                    <div class="text-danger small">{{ form.position.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="id_hire_date" class="form-label">Hire Date <span class="text-danger">*</span></label>
+                                {{ form.hire_date }}
+                                {% if form.hire_date.errors %}
+                                    <div class="text-danger small">{{ form.hire_date.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="id_employment_type" class="form-label">Employment Type</label>
+                                {{ form.employment_type }}
+                                {% if form.employment_type.errors %}
+                                    <div class="text-danger small">{{ form.employment_type.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="id_employment_status" class="form-label">Employment Status</label>
+                                {{ form.employment_status }}
+                                {% if form.employment_status.errors %}
+                                    <div class="text-danger small">{{ form.employment_status.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="id_salary" class="form-label">Salary</label>
+                                {{ form.salary }}
+                                {% if form.salary.errors %}
+                                    <div class="text-danger small">{{ form.salary.errors }}</div>
+                                {% endif %}
+                                <small class="text-muted">{{ form.salary.help_text }}</small>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="id_date_of_birth" class="form-label">Date of Birth</label>
+                                {{ form.date_of_birth }}
+                                {% if form.date_of_birth.errors %}
+                                    <div class="text-danger small">{{ form.date_of_birth.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Contact Information Section -->
+                        <h6 class="mb-3 text-primary"><i class="fas fa-phone me-2"></i>Contact Information</h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="id_phone" class="form-label">Phone Number</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger small">{{ form.phone.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_emergency_contact" class="form-label">Emergency Contact Name</label>
+                                {{ form.emergency_contact }}
+                                {% if form.emergency_contact.errors %}
+                                    <div class="text-danger small">{{ form.emergency_contact.errors }}</div>
+                                {% endif %}
+                                <small class="text-muted">{{ form.emergency_contact.help_text }}</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_emergency_phone" class="form-label">Emergency Contact Phone</label>
+                                {{ form.emergency_phone }}
+                                {% if form.emergency_phone.errors %}
+                                    <div class="text-danger small">{{ form.emergency_phone.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="id_address" class="form-label">Address</label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                    <div class="text-danger small">{{ form.address.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_profile_picture" class="form-label">Profile Picture</label>
+                                {{ form.profile_picture }}
+                                {% if form.profile_picture.errors %}
+                                    <div class="text-danger small">{{ form.profile_picture.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'employees:list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Staff Member
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

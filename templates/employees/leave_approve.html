@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Approve Leave Request - School Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-calendar-check me-2"></i>Leave Request Approval</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employees:leave_requests' %}">Leave Requests</a></li>
+                    <li class="breadcrumb-item active">Approve</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Leave Request Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Employee:</strong>
+                            <p>{{ leave_request.employee.user.get_full_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Employee ID:</strong>
+                            <p>{{ leave_request.employee.employee_id }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Leave Type:</strong>
+                            <p>{{ leave_request.leave_type.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Duration:</strong>
+                            <p>{{ leave_request.duration }} day(s)</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Start Date:</strong>
+                            <p>{{ leave_request.start_date|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>End Date:</strong>
+                            <p>{{ leave_request.end_date|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Reason:</strong>
+                            <p class="border p-3 rounded bg-light">{{ leave_request.reason }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Applied On:</strong>
+                            <p>{{ leave_request.applied_on|date:"F d, Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Current Status:</strong>
+                            <p>
+                                {% if leave_request.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elif leave_request.status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif leave_request.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ leave_request.status|title }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'employees:leave_requests' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to List
+                            </a>
+                            <div>
+                                <button type="submit" name="action" value="rejected" class="btn btn-danger me-2">
+                                    <i class="fas fa-times me-2"></i>Reject
+                                </button>
+                                <button type="submit" name="action" value="approved" class="btn btn-success">
+                                    <i class="fas fa-check me-2"></i>Approve
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

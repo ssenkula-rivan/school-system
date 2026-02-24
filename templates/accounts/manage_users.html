@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage User Accounts</h2>
+        <span class="badge bg-primary">{{ manager_role|title }}</span>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <form method="get" class="row g-3">
+                <div class="col-md-10">
+                    <input type="text" name="search" class="form-control" placeholder="Search by username, name, or employee ID..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+        <div class="card-body">
+            {% if page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Username</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for profile in page_obj %}
+                            <tr>
+                                <td>{{ profile.employee_id }}</td>
+                                <td>{{ profile.user.username }}</td>
+                                <td>{{ profile.user.get_full_name }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ profile.get_role_display }}</span>
+                                </td>
+                                <td>
+                                    {% if profile.is_active_employee %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'accounts:change_user_role' profile.user.id %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-user-edit"></i> Change Role
+                                    </a>
+                                    <a href="{% url 'accounts:delete_user' profile.user.id %}" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if page_obj.has_other_pages %}
+                <nav>
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a></li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <p class="text-muted">No users found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4">
+        <h6>Your Permissions:</h6>
+        <ul class="mb-0">
+            {% if is_sysadmin %}
+                <li>System Administrator - Full control over all accounts</li>
+            {% elif manager_role == 'director' %}
+                <li>Can delete and modify all accounts except System Administrators and other Directors</li>
+                <li>Can change HR Manager</li>
+            {% elif manager_role == 'hr_manager' %}
+                <li>Can delete and modify employee accounts (teachers, security, staff, etc.)</li>
+                <li>Cannot modify Director, HR Manager, or System Administrator accounts</li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

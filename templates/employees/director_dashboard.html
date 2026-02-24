@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Director Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2>Director of Studies Dashboard</h2>
+    <p class="text-muted">Welcome, {{ user.get_full_name }}!</p>
+
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total Teachers</h5>
+                    <h2>{{ total_teachers }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <h5>Heads of Class</h5>
+                    <h2>{{ total_heads }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>Pending Review</h5>
+                    <h2>{{ pending_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Approved</h5>
+                    <h2>{{ approved_count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <strong>Note:</strong> You receive submissions from Heads of Class. Regular teachers submit to their respective Heads of Class first.
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="mb-0">Pending Submissions</h5>
+                    <a href="{% url 'employees:review_submissions' %}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if pending_submissions %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Teacher</th>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Subject</th>
+                                        <th>Submitted</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for submission in pending_submissions %}
+                                    <tr>
+                                        <td>
+                                            {{ submission.teacher.get_full_name }}
+                                            {% if submission.teacher.userprofile.role == 'head_of_class' %}
+                                                <span class="badge bg-secondary">Head of Class</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ submission.title }}</td>
+                                        <td>{{ submission.get_work_type_display }}</td>
+                                        <td>{{ submission.subject|default:"-" }}</td>
+                                        <td>{{ submission.submitted_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            <a href="{% url 'employees:review_submission_detail' submission.id %}" class="btn btn-sm btn-primary">Review</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No pending submissions.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

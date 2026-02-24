@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Attendance Records - School Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-clock me-2"></i>Attendance Records</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employees:dashboard' %}">Staff Management</a></li>
+                    <li class="breadcrumb-item active">Attendance</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h3>{{ total_present }}</h3>
+                    <p class="mb-0">Present</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-danger text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-times-circle fa-2x mb-2"></i>
+                    <h3>{{ total_absent }}</h3>
+                    <p class="mb-0">Absent</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h3>{{ total_late }}</h3>
+                    <p class="mb-0">Late</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar fa-2x mb-2"></i>
+                    <h3>{{ current_month|date:"M Y" }}</h3>
+                    <p class="mb-0">Current Period</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Records Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Attendance Records - {{ current_month|date:"F Y" }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if attendance_records %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Employee</th>
+                                        <th>Check In</th>
+                                        <th>Check Out</th>
+                                        <th>Hours Worked</th>
+                                        <th>Status</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in attendance_records %}
+                                    <tr>
+                                        <td>{{ record.date|date:"M d, Y" }}</td>
+                                        <td>
+                                            <strong>{{ record.employee.user.get_full_name }}</strong>
+                                            <br><small class="text-muted">{{ record.employee.employee_id }}</small>
+                                        </td>
+                                        <td>{{ record.check_in|time:"H:i"|default:"--:--" }}</td>
+                                        <td>{{ record.check_out|time:"H:i"|default:"--:--" }}</td>
+                                        <td>
+                                            {% if record.hours_worked %}
+                                                {{ record.hours_worked|floatformat:1 }} hrs
+                                            {% else %}
+                                                --
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if record.is_present %}
+                                                {% if record.is_late %}
+                                                    <span class="badge bg-warning">Late</span>
+                                                {% else %}
+                                                    <span class="badge bg-success">Present</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-danger">Absent</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if record.notes %}
+                                                <small>{{ record.notes|truncatewords:5 }}</small>
+                                            {% else %}
+                                                <small class="text-muted">No notes</small>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                            <p class="text-muted">No attendance records found for this period</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

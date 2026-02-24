@@ -1,0 +1,559 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ employee.user.get_full_name }} - Employee Details{% endblock %}
+
+{% block page_title %}Employee Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'employees:list' %}">Employees</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ employee.user.get_full_name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'employees:edit' employee.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Edit Employee
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Employee Profile Card -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <!-- Profile Picture -->
+                    <div class="mb-4">
+                        {% if employee.profile_picture %}
+                            <img src="{{ employee.profile_picture.url }}" 
+                                 alt="{{ employee.user.get_full_name }}" 
+                                 class="rounded-circle border shadow-sm"
+                                 style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold border shadow-sm"
+                                 style="width: 150px; height: 150px; font-size: 3rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                {% if employee.user.first_name %}
+                                    {{ employee.user.first_name.0|upper }}{% if employee.user.last_name %}{{ employee.user.last_name.0|upper }}{% endif %}
+                                {% else %}
+                                    {{ employee.user.username.0|upper }}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Basic Info -->
+                    <h3 class="mb-2 text-dark">{{ employee.user.get_full_name|default:employee.user.username }}</h3>
+                    {% if employee.position %}
+                        <p class="text-primary fw-semibold mb-3">{{ employee.position.title }}</p>
+                    {% endif %}
+                    
+                    <!-- Status Badges -->
+                    <div class="mb-4">
+                        <span class="badge px-3 py-2 me-2 
+                            {% if employee.employment_status == 'active' %}bg-success{% elif employee.employment_status == 'on_leave' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                            {{ employee.get_employment_status_display }}
+                        </span>
+                        <span class="badge bg-light text-dark px-3 py-2">
+                            {{ employee.get_employment_type_display }}
+                        </span>
+                    </div>
+                    
+                    <!-- Contact Info -->
+                    <div class="text-start">
+                        <hr class="my-4">
+                        
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-id-badge text-muted me-3" style="width: 20px;"></i>
+                                <div>
+                                    <small class="text-muted d-block">Employee ID</small>
+                                    <strong>{{ employee.employee_id }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if employee.user.email %}
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-envelope text-muted me-3" style="width: 20px;"></i>
+                                <div class="flex-grow-1">
+                                    <small class="text-muted d-block">Email</small>
+                                    <a href="mailto:{{ employee.user.email }}" class="text-decoration-none">
+                                        {{ employee.user.email }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if employee.phone %}
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-phone text-muted me-3" style="width: 20px;"></i>
+                                <div>
+                                    <small class="text-muted d-block">Phone</small>
+                                    <a href="tel:{{ employee.phone }}" class="text-decoration-none">{{ employee.phone }}</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if employee.department %}
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-building text-muted me-3" style="width: 20px;"></i>
+                                <div>
+                                    <small class="text-muted d-block">Department</small>
+                                    <strong>{{ employee.department.name }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-calendar text-muted me-3" style="width: 20px;"></i>
+                                <div>
+                                    <small class="text-muted d-block">Hire Date</small>
+                                    <strong>{{ employee.hire_date|date:"M d, Y" }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if employee.years_of_service %}
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-clock text-muted me-3" style="width: 20px;"></i>
+                                <div>
+                                    <small class="text-muted d-block">Years of Service</small>
+                                    <strong>{{ employee.years_of_service }} year{{ employee.years_of_service|pluralize }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if employee.age %}
+                        <div class="contact-item mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-birthday-cake text-muted me-3" style="width: 20px;"></i>
+                                <div>
+                                    <small class="text-muted d-block">Age</small>
+                                    <strong>{{ employee.age }} years</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Details and Statistics -->
+        <div class="col-lg-8">
+            <!-- Quick Stats -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-6 mb-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body text-center">
+                            <h2 class="mb-1">{{ attendance_stats.present_days|default:0 }}</h2>
+                            <div class="fw-semibold">Present Days</div>
+                            <small class="opacity-75"><i class="fas fa-calendar-check me-1"></i>This Month</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6 mb-3">
+                    <div class="card bg-warning text-dark h-100">
+                        <div class="card-body text-center">
+                            <h2 class="mb-1">{{ attendance_stats.late_days|default:0 }}</h2>
+                            <div class="fw-semibold">Late Days</div>
+                            <small class="opacity-75"><i class="fas fa-clock me-1"></i>This Month</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6 mb-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body text-center">
+                            <h2 class="mb-1">{{ recent_reviews|length|default:0 }}</h2>
+                            <div class="fw-semibold">Reviews</div>
+                            <small class="opacity-75"><i class="fas fa-star me-1"></i>Total</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6 mb-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body text-center">
+                            <h2 class="mb-1">{{ recent_leaves|length|default:0 }}</h2>
+                            <div class="fw-semibold">Leave Requests</div>
+                            <small class="opacity-75"><i class="fas fa-calendar-times me-1"></i>Recent</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabs for Different Sections -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="employeeTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#personal" type="button" role="tab">
+                                <i class="fas fa-user me-2"></i>Personal Info
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="performance-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#performance" type="button" role="tab">
+                                <i class="fas fa-chart-line me-2"></i>Performance
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="leaves-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#leaves" type="button" role="tab">
+                                <i class="fas fa-calendar-alt me-2"></i>Leave History
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="employeeTabContent">
+                        <!-- Personal Information Tab -->
+                        <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                            <div class="row">
+                                <div class="col-lg-6 mb-4">
+                                    <h6 class="text-primary mb-3 border-bottom pb-2">
+                                        <i class="fas fa-briefcase me-2"></i>Employment Details
+                                    </h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td width="40%"><strong>Employee ID:</strong></td>
+                                            <td>{{ employee.employee_id }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Department:</strong></td>
+                                            <td>{{ employee.department.name|default:"-" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Position:</strong></td>
+                                            <td>{{ employee.position.title|default:"-" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Employment Type:</strong></td>
+                                            <td>{{ employee.get_employment_type_display }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Status:</strong></td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if employee.employment_status == 'active' %}bg-success{% elif employee.employment_status == 'on_leave' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                                    {{ employee.get_employment_status_display }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Hire Date:</strong></td>
+                                            <td>{{ employee.hire_date|date:"F d, Y" }}</td>
+                                        </tr>
+                                        {% if employee.salary %}
+                                        <tr>
+                                            <td><strong>Salary:</strong></td>
+                                            <td class="text-success fw-bold">${{ employee.salary|floatformat:0 }}</td>
+                                        </tr>
+                                        {% endif %}
+                                    </table>
+                                </div>
+                                <div class="col-lg-6 mb-4">
+                                    <h6 class="text-primary mb-3 border-bottom pb-2">
+                                        <i class="fas fa-user me-2"></i>Personal Details
+                                    </h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td width="40%"><strong>Full Name:</strong></td>
+                                            <td>{{ employee.user.get_full_name|default:employee.user.username }}</td>
+                                        </tr>
+                                        {% if employee.date_of_birth %}
+                                        <tr>
+                                            <td><strong>Date of Birth:</strong></td>
+                                            <td>{{ employee.date_of_birth|date:"F d, Y" }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr>
+                                            <td><strong>Email:</strong></td>
+                                            <td>
+                                                {% if employee.user.email %}
+                                                    <a href="mailto:{{ employee.user.email }}" class="text-decoration-none">
+                                                        {{ employee.user.email }}
+                                                    </a>
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Phone:</strong></td>
+                                            <td>
+                                                {% if employee.phone %}
+                                                    <a href="tel:{{ employee.phone }}" class="text-decoration-none">
+                                                        {{ employee.phone }}
+                                                    </a>
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% if employee.emergency_contact %}
+                                        <tr>
+                                            <td><strong>Emergency Contact:</strong></td>
+                                            <td>{{ employee.emergency_contact }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if employee.emergency_phone %}
+                                        <tr>
+                                            <td><strong>Emergency Phone:</strong></td>
+                                            <td>
+                                                <a href="tel:{{ employee.emergency_phone }}" class="text-decoration-none">
+                                                    {{ employee.emergency_phone }}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    </table>
+                                    
+                                    {% if employee.address %}
+                                    <h6 class="text-primary mb-2 mt-4 border-bottom pb-2">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Address
+                                    </h6>
+                                    <p class="text-muted">{{ employee.address }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Performance Tab -->
+                        <div class="tab-pane fade" id="performance" role="tabpanel">
+                            <h6 class="text-primary mb-4 border-bottom pb-2">
+                                <i class="fas fa-chart-line me-2"></i>Recent Performance Reviews
+                            </h6>
+                            {% if recent_reviews %}
+                                {% for review in recent_reviews %}
+                                <div class="card mb-4 border">
+                                    <div class="card-body">
+                                        <div class="row align-items-center mb-3">
+                                            <div class="col-md-8">
+                                                <h6 class="mb-1">Review Period: {{ review.review_period_start|date:"M Y" }} - {{ review.review_period_end|date:"M Y" }}</h6>
+                                                <p class="text-muted mb-0">
+                                                    <i class="fas fa-user-tie me-1"></i>
+                                                    Reviewed by: {{ review.reviewer.get_full_name }}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-4 text-md-end">
+                                                <h2 class="text-primary mb-0">{{ review.average_rating|floatformat:1 }}/5</h2>
+                                                <small class="text-muted">Average Rating</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row text-center">
+                                            <div class="col-lg col-md-6 mb-3">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h4 class="text-primary mb-1">{{ review.overall_rating|default:"-" }}/5</h4>
+                                                    <small class="text-muted fw-semibold">Overall</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg col-md-6 mb-3">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h4 class="text-success mb-1">{{ review.goals_achievement|default:"-" }}/5</h4>
+                                                    <small class="text-muted fw-semibold">Goals</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg col-md-6 mb-3">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h4 class="text-info mb-1">{{ review.communication|default:"-" }}/5</h4>
+                                                    <small class="text-muted fw-semibold">Communication</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg col-md-6 mb-3">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h4 class="text-warning mb-1">{{ review.teamwork|default:"-" }}/5</h4>
+                                                    <small class="text-muted fw-semibold">Teamwork</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg col-md-6 mb-3">
+                                                <div class="p-3 bg-light rounded">
+                                                    <h4 class="text-danger mb-1">{{ review.technical_skills|default:"-" }}/5</h4>
+                                                    <small class="text-muted fw-semibold">Technical</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if review.comments %}
+                                        <div class="mt-4">
+                                            <h6 class="mb-2">
+                                                <i class="fas fa-comment-dots me-2"></i>Comments:
+                                            </h6>
+                                            <div class="p-3 bg-light rounded">
+                                                <p class="mb-0">{{ review.comments }}</p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <i class="fas fa-chart-line text-muted mb-3" style="font-size: 4rem; opacity: 0.3;"></i>
+                                    <h4 class="text-muted mb-2">No Performance Reviews</h4>
+                                    <p class="text-muted">No performance reviews have been conducted yet.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Leave History Tab -->
+                        <div class="tab-pane fade" id="leaves" role="tabpanel">
+                            <h6 class="text-primary mb-4 border-bottom pb-2">
+                                <i class="fas fa-calendar-alt me-2"></i>Recent Leave Requests
+                            </h6>
+                            {% if recent_leaves %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Leave Type</th>
+                                                <th>Period</th>
+                                                <th>Duration</th>
+                                                <th>Status</th>
+                                                <th>Applied Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for leave in recent_leaves %}
+                                            <tr>
+                                                <td>{{ leave.leave_type.name }}</td>
+                                                <td>{{ leave.start_date|date:"M d" }} - {{ leave.end_date|date:"M d, Y" }}</td>
+                                                <td>
+                                                    <span class="badge bg-light text-dark">
+                                                        {{ leave.duration }} day{{ leave.duration|pluralize }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge 
+                                                        {% if leave.status == 'approved' %}bg-success{% elif leave.status == 'pending' %}bg-warning text-dark{% elif leave.status == 'rejected' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                        {{ leave.get_status_display }}
+                                                    </span>
+                                                </td>
+                                                <td><small class="text-muted">{{ leave.applied_on|date:"M d, Y" }}</small></td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 4rem; opacity: 0.3;"></i>
+                                    <h4 class="text-muted mb-2">No Leave Requests</h4>
+                                    <p class="text-muted">No leave requests have been submitted yet.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tabs
+    var triggerTabList = [].slice.call(document.querySelectorAll('#employeeTab button'));
+    triggerTabList.forEach(function (triggerEl) {
+        var tabTrigger = new bootstrap.Tab(triggerEl);
+        
+        triggerEl.addEventListener('click', function (event) {
+            event.preventDefault();
+            tabTrigger.show();
+        });
+    });
+    
+    // Add smooth animations
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+
+<style>
+.card {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.contact-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.contact-item:last-child {
+    border-bottom: none;
+}
+
+.nav-tabs .nav-link {
+    color: #6c757d;
+    border: none;
+    border-bottom: 3px solid transparent;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+    background-color: transparent;
+    border-color: transparent;
+    border-bottom-color: #0d6efd;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: transparent;
+    color: #0d6efd;
+}
+
+.table-borderless td {
+    border: none;
+    padding: 0.75rem 0.5rem;
+}
+
+.badge {
+    font-size: 0.875em;
+}
+
+@media (max-width: 768px) {
+    .col-lg-3 {
+        margin-bottom: 1rem;
+    }
+    
+    .display-6 {
+        font-size: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+</style>
+{% endblock %}

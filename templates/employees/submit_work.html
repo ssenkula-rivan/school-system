@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Work{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    {% if user_role == 'teacher' %}
+                        {% if class_name %}
+                            <h4>Submit Work to Head of Class ({{ class_name }})</h4>
+                        {% else %}
+                            <h4>Submit Work to Director of Studies</h4>
+                        {% endif %}
+                    {% elif user_role == 'head_of_class' %}
+                        <h4>Submit Work to Director of Studies</h4>
+                    {% else %}
+                        <h4>Submit Work</h4>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if user_role == 'teacher' and class_name %}
+                    <div class="alert alert-info">
+                        <strong>Note:</strong> Your work will be submitted to your Head of Class for review before going to the Director.
+                    </div>
+                    {% elif user_role == 'head_of_class' %}
+                    <div class="alert alert-info">
+                        <strong>Note:</strong> As Head of Class, your work will be submitted directly to the Director of Studies.
+                    </div>
+                    {% endif %}
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title *</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="work_type" class="form-label">Work Type *</label>
+                            <select class="form-select" id="work_type" name="work_type" required>
+                                <option value="">Select type...</option>
+                                {% for value, label in work_types %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="subject" class="form-label">Subject</label>
+                                <input type="text" class="form-control" id="subject" name="subject">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="grade_level" class="form-label">Grade Level</label>
+                                <input type="text" class="form-control" id="grade_level" name="grade_level">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description *</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="document" class="form-label">Attach Document</label>
+                            <input type="file" class="form-control" id="document" name="document">
+                            <small class="form-text text-muted">Supported formats: PDF, DOC, DOCX, XLS, XLSX</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Submit Work</button>
+                            {% if user_role == 'head_of_class' %}
+                                <a href="{% url 'employees:head_of_class_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                            {% else %}
+                                <a href="{% url 'employees:teacher_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

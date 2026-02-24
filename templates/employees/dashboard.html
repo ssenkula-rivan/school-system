@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Management Dashboard - School Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .sidebar {
+            background: white;
+            min-height: calc(100vh - 56px);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+        .sidebar .nav-link {
+            color: #495057;
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover {
+            background: #f8f9fa;
+            color: #667eea;
+            transform: translateX(5px);
+        }
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .chart-card {
+            height: 100%;
+        }
+        .activity-item {
+            padding: 15px;
+            border-left: 3px solid #e9ecef;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .activity-item:hover {
+            border-left-color: #667eea;
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'accounts:dashboard' %}">
+                <i class="fas fa-graduation-cap me-2"></i>
+                School Management System
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                <span class="text-white me-3">
+                    <i class="fas fa-user-circle me-2"></i>
+                    {{ user.get_full_name|default:user.username }}
+                </span>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar p-0">
+                <nav class="nav flex-column py-3">
+                    <a class="nav-link" href="{% url 'accounts:dashboard' %}">
+                        <i class="fas fa-home"></i>Dashboard
+                    </a>
+                    <a class="nav-link active" href="{% url 'employees:dashboard' %}">
+                        <i class="fas fa-users"></i>Staff Management
+                    </a>
+                    <a class="nav-link" href="{% url 'employees:leave_requests' %}">
+                        <i class="fas fa-calendar-alt"></i>Leave Requests
+                    </a>
+                    <a class="nav-link" href="{% url 'employees:attendance' %}">
+                        <i class="fas fa-clock"></i>Attendance
+                    </a>
+                    <a class="nav-link" href="{% url 'employees:performance_reviews' %}">
+                        <i class="fas fa-star"></i>Performance
+                    </a>
+                    <hr class="my-2">
+                    <a class="nav-link" href="{% url 'accounts:profile' %}">
+                        <i class="fas fa-user-circle"></i>My Profile
+                    </a>
+                    <a class="nav-link" href="/admin/">
+                        <i class="fas fa-cog"></i>Admin Panel
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-4">
+                <!-- Header -->
+                <div class="mb-4">
+                    <h2><i class="fas fa-users-cog me-2"></i>Staff Management Dashboard</h2>
+                    <p class="text-muted">Overview of all staff members and activities</p>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h3 class="mb-1">{{ total_employees }}</h3>
+                                        <p class="mb-0">Total Staff</p>
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-users fa-3x opacity-75"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <small><i class="fas fa-arrow-up me-1"></i>{{ recent_hires }} new this month</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="stat-card card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h3 class="mb-1">{{ total_departments }}</h3>
+                                        <p class="mb-0">Departments</p>
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-building fa-3x opacity-75"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <small><i class="fas fa-check-circle me-1"></i>All active</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="stat-card card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h3 class="mb-1">{{ pending_leaves }}</h3>
+                                        <p class="mb-0">Pending Leaves</p>
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-calendar-times fa-3x opacity-75"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <small><i class="fas fa-clock me-1"></i>Awaiting approval</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="stat-card card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h3 class="mb-1">{{ recent_hires }}</h3>
+                                        <p class="mb-0">Recent Hires</p>
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-user-plus fa-3x opacity-75"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <small><i class="fas fa-calendar me-1"></i>Last 30 days</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-bolt text-warning me-2"></i>Quick Actions
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <a href="{% url 'employees:create' %}" class="btn btn-primary w-100 py-3">
+                                    <i class="fas fa-user-plus fa-2x d-block mb-2"></i>
+                                    <strong>Add Staff</strong>
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'employees:list' %}" class="btn btn-outline-primary w-100 py-3">
+                                    <i class="fas fa-list fa-2x d-block mb-2"></i>
+                                    <strong>View All Staff</strong>
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'employees:leave_requests' %}" class="btn btn-outline-warning w-100 py-3">
+                                    <i class="fas fa-calendar-check fa-2x d-block mb-2"></i>
+                                    <strong>Leave Requests</strong>
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'employees:attendance' %}" class="btn btn-outline-info w-100 py-3">
+                                    <i class="fas fa-clock fa-2x d-block mb-2"></i>
+                                    <strong>Attendance</strong>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Department Statistics and Recent Activity -->
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card chart-card">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chart-pie text-primary me-2"></i>
+                                    Department Distribution
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {% if dept_stats %}
+                                    {% for dept in dept_stats %}
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span><strong>{{ dept.name }}</strong></span>
+                                            <span class="text-muted">{{ dept.employee_count }} staff</span>
+                                        </div>
+                                        <div class="progress" style="height: 10px;">
+                                            <div class="progress-bar bg-primary" 
+                                                 style="width: {% widthratio dept.employee_count total_employees 100 %}%">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No departments created yet</p>
+                                        <a href="/admin/employees/department/add/" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-plus me-1"></i>Add Department
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card chart-card">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-clock text-success me-2"></i>
+                                    Recent Activities
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {% if recent_employees %}
+                                    {% for employee in recent_employees %}
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user-plus"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <strong>{{ employee.user.get_full_name }}</strong>
+                                                <p class="mb-0 text-muted small">
+                                                    Joined {{ employee.department.name|default:"the school" }}
+                                                </p>
+                                            </div>
+                                            <small class="text-muted">{{ employee.created_at|timesince }} ago</small>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted">No recent activities</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Staff and Leave Requests -->
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-users text-info me-2"></i>
+                                    Recently Added Staff
+                                </h5>
+                                <a href="{% url 'employees:list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                            </div>
+                            <div class="card-body">
+                                {% if recent_employees %}
+                                    <div class="list-group list-group-flush">
+                                        {% for employee in recent_employees %}
+                                        <div class="list-group-item d-flex align-items-center">
+                                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                <strong>{{ employee.user.first_name.0 }}{{ employee.user.last_name.0 }}</strong>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <strong>{{ employee.user.get_full_name }}</strong>
+                                                <p class="mb-0 text-muted small">{{ employee.employee_id }} - {{ employee.department.name|default:"No Department" }}</p>
+                                            </div>
+                                            <a href="{% url 'employees:detail' employee.pk %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-4">
+                                        <p class="text-muted">No staff members yet</p>
+                                        <a href="{% url 'employees:create' %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-user-plus me-1"></i>Add First Staff
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-calendar-alt text-warning me-2"></i>
+                                    Recent Leave Requests
+                                </h5>
+                                <a href="{% url 'employees:leave_requests' %}" class="btn btn-sm btn-outline-warning">View All</a>
+                            </div>
+                            <div class="card-body">
+                                {% if recent_leaves %}
+                                    <div class="list-group list-group-flush">
+                                        {% for leave in recent_leaves %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <strong>{{ leave.employee.user.get_full_name }}</strong>
+                                                    <p class="mb-1 text-muted small">
+                                                        {{ leave.leave_type.name }} - {{ leave.start_date|date:"M d" }} to {{ leave.end_date|date:"M d" }}
+                                                    </p>
+                                                </div>
+                                                {% if leave.status == 'pending' %}
+                                                    <span class="badge bg-warning">Pending</span>
+                                                {% elif leave.status == 'approved' %}
+                                                    <span class="badge bg-success">Approved</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Rejected</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-4">
+                                        <p class="text-muted">No leave requests</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Actions Alert -->
+                {% if pending_leaves > 0 %}
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading mb-1">Pending Actions Required</h5>
+                        <p class="mb-0">You have {{ pending_leaves }} leave request(s) awaiting approval.</p>
+                    </div>
+                    <a href="{% url 'employees:leave_requests' %}" class="btn btn-warning">
+                        <i class="fas fa-eye me-1"></i>Review Now
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

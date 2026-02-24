@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Head of Class Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Head of Class Dashboard - {{ class_name }}</h2>
+    
+    <!-- Statistics Cards -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Class Teachers</h5>
+                    <h2>{{ total_class_teachers }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Reviews</h5>
+                    <h2>{{ pending_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Approved</h5>
+                    <h2>{{ approved_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Submissions</h5>
+                    <h2>{{ total_submissions }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'employees:submit_work' %}" class="btn btn-primary">Submit Work to Director</a>
+                    <a href="{% url 'employees:review_submissions' %}" class="btn btn-success">Review Teacher Submissions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- My Submissions to Director -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>My Submissions to Director (Pending: {{ my_pending }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if my_submissions %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                    <th>Submitted</th>
+                                    <th>Feedback</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for submission in my_submissions %}
+                                <tr>
+                                    <td>{{ submission.title }}</td>
+                                    <td>{{ submission.get_work_type_display }}</td>
+                                    <td>{{ submission.subject|default:"-" }}</td>
+                                    <td>
+                                        {% if submission.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif submission.status == 'approved' %}
+                                            <span class="badge bg-success">Approved</span>
+                                        {% elif submission.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% elif submission.status == 'revision' %}
+                                            <span class="badge bg-info">Needs Revision</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ submission.submitted_at|date:"M d, Y H:i" }}</td>
+                                    <td>{{ submission.feedback|truncatewords:10|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No submissions yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Submissions from Class Teachers -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Pending Submissions from Class Teachers</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_submissions %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Teacher</th>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Subject</th>
+                                    <th>Grade</th>
+                                    <th>Submitted</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for submission in pending_submissions %}
+                                <tr>
+                                    <td>{{ submission.teacher.get_full_name }}</td>
+                                    <td>{{ submission.title }}</td>
+                                    <td>{{ submission.get_work_type_display }}</td>
+                                    <td>{{ submission.subject|default:"-" }}</td>
+                                    <td>{{ submission.grade_level|default:"-" }}</td>
+                                    <td>{{ submission.submitted_at|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        <a href="{% url 'employees:review_submission_detail' submission.pk %}" class="btn btn-sm btn-primary">Review</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No pending submissions.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Class Teachers -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Teachers in {{ class_name }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if class_teachers %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Employee ID</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for teacher in class_teachers %}
+                                <tr>
+                                    <td>{{ teacher.user.get_full_name }}</td>
+                                    <td>{{ teacher.employee_id }}</td>
+                                    <td>{{ teacher.user.email }}</td>
+                                    <td>{{ teacher.phone|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No teachers assigned to this class yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

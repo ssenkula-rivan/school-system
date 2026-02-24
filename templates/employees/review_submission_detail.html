@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Submission{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>{{ submission.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Teacher:</dt>
+                        <dd class="col-sm-9">{{ submission.teacher.get_full_name }}</dd>
+                        
+                        <dt class="col-sm-3">Work Type:</dt>
+                        <dd class="col-sm-9">{{ submission.get_work_type_display }}</dd>
+                        
+                        <dt class="col-sm-3">Subject:</dt>
+                        <dd class="col-sm-9">{{ submission.subject|default:"-" }}</dd>
+                        
+                        <dt class="col-sm-3">Grade Level:</dt>
+                        <dd class="col-sm-9">{{ submission.grade_level|default:"-" }}</dd>
+                        
+                        <dt class="col-sm-3">Submitted:</dt>
+                        <dd class="col-sm-9">{{ submission.submitted_at|date:"M d, Y H:i" }}</dd>
+                        
+                        <dt class="col-sm-3">Status:</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-{{ submission.status }}">{{ submission.get_status_display }}</span>
+                        </dd>
+                    </dl>
+                    
+                    <hr>
+                    
+                    <h5>Description:</h5>
+                    <p>{{ submission.description }}</p>
+                    
+                    {% if submission.document %}
+                    <hr>
+                    <h5>Attached Document:</h5>
+                    <a href="{{ submission.document.url }}" class="btn btn-outline-primary" target="_blank">
+                        <i class="fas fa-download"></i> Download Document
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Review Actions</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="feedback" class="form-label">Feedback</label>
+                            <textarea class="form-control" id="feedback" name="feedback" rows="5" placeholder="Provide feedback to the teacher..."></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="action" value="approved" class="btn btn-success">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button type="submit" name="action" value="revision" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Request Revision
+                            </button>
+                            <button type="submit" name="action" value="rejected" class="btn btn-danger">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                            <a href="{% url 'employees:review_submissions' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            {% if submission.feedback %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6>Previous Feedback</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>By:</strong> {{ submission.reviewed_by.get_full_name }}</p>
+                    <p><strong>Date:</strong> {{ submission.reviewed_at|date:"M d, Y H:i" }}</p>
+                    <hr>
+                    <p>{{ submission.feedback }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

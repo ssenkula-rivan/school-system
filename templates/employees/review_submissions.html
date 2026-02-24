@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Submissions{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2>Teacher Work Submissions</h2>
+    
+    <div class="card mt-4">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link {% if status_filter == 'pending' %}active{% endif %}" href="?status=pending">Pending</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if status_filter == 'approved' %}active{% endif %}" href="?status=approved">Approved</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if status_filter == 'rejected' %}active{% endif %}" href="?status=rejected">Rejected</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if status_filter == 'revision' %}active{% endif %}" href="?status=revision">Needs Revision</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            {% if page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Teacher</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Subject</th>
+                                <th>Grade</th>
+                                <th>Submitted</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for submission in page_obj %}
+                            <tr>
+                                <td>{{ submission.teacher.get_full_name }}</td>
+                                <td>{{ submission.title }}</td>
+                                <td>{{ submission.get_work_type_display }}</td>
+                                <td>{{ submission.subject|default:"-" }}</td>
+                                <td>{{ submission.grade_level|default:"-" }}</td>
+                                <td>{{ submission.submitted_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'employees:review_submission_detail' submission.id %}" class="btn btn-sm btn-primary">Review</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if page_obj.has_other_pages %}
+                <nav>
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?status={{ status_filter }}&page={{ page_obj.previous_page_number }}">Previous</a></li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?status={{ status_filter }}&page={{ page_obj.next_page_number }}">Next</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <p class="text-muted">No submissions found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

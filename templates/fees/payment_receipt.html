@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Receipt - {{ payment.receipt_number }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .receipt { max-width: 800px; margin: 0 auto; border: 2px solid #333; padding: 30px; }
+        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px; }
+        .details { margin: 20px 0; }
+        .details p { margin: 10px 0; }
+        .amount { font-size: 24px; font-weight: bold; color: #28a745; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="receipt">
+        <div class="header">
+            <h1>SCHOOL MANAGEMENT SYSTEM</h1>
+            <h2>Payment Receipt</h2>
+        </div>
+        <div class="details">
+            <p><strong>Receipt Number:</strong> {{ payment.receipt_number }}</p>
+            <p><strong>Date:</strong> {{ payment.payment_date|date:"F d, Y" }}</p>
+            <p><strong>Student Name:</strong> {{ payment.student.get_full_name }}</p>
+            <p><strong>Admission Number:</strong> {{ payment.student.admission_number }}</p>
+            <p><strong>Grade:</strong> {{ payment.student.grade.name|default:"N/A" }}</p>
+            <hr>
+            <p><strong>Payment Method:</strong> {{ payment.get_payment_method_display }}</p>
+            <p><strong>Transaction Reference:</strong> {{ payment.transaction_reference|default:"N/A" }}</p>
+            <p class="amount">Amount Paid: ${{ payment.amount_paid }}</p>
+            <hr>
+            <p><strong>Received By:</strong> {{ payment.received_by.get_full_name|default:"System" }}</p>
+            <p><strong>Date Issued:</strong> {{ payment.created_at|date:"F d, Y H:i" }}</p>
+        </div>
+        <div class="no-print" style="text-align: center; margin-top: 30px;">
+            <button onclick="window.print()" class="btn btn-primary">Print Receipt</button>
+        </div>
+    </div>
+</body>
+</html>

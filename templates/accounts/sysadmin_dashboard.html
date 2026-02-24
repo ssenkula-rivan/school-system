@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}System Administrator Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="alert alert-danger">
+        <i class="fas fa-shield-alt me-2"></i>
+        <strong>System Administrator Mode</strong> - Full system access enabled
+    </div>
+
+    <h2>System Administrator Dashboard</h2>
+    <p class="text-muted">Cranictech Developer Access - Full Control Panel</p>
+
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5>Total Users</h5>
+                    <h2>{{ total_users }}</h2>
+                    <a href="/admin/auth/user/" class="btn btn-light btn-sm mt-2">Manage Users</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>User Profiles</h5>
+                    <h2>{{ total_profiles }}</h2>
+                    <a href="/admin/accounts/userprofile/" class="btn btn-light btn-sm mt-2">Manage Profiles</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>Students</h5>
+                    <h2>{{ total_students }}</h2>
+                    <a href="/admin/fees/student/" class="btn btn-light btn-sm mt-2">Manage Students</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Employees</h5>
+                    <h2>{{ total_employees }}</h2>
+                    <a href="/admin/employees/employee/" class="btn btn-light btn-sm mt-2">Manage Employees</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-tools"></i> System Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="/admin/" class="list-group-item list-group-item-action">
+                            <i class="fas fa-cog me-2"></i>Django Admin Panel
+                        </a>
+                        <a href="/admin/auth/user/" class="list-group-item list-group-item-action">
+                            <i class="fas fa-users me-2"></i>Reset User Passwords
+                        </a>
+                        <a href="/admin/fees/feepayment/" class="list-group-item list-group-item-action">
+                            <i class="fas fa-money-bill me-2"></i>Manage Payments
+                        </a>
+                        <a href="/admin/employees/worksubmission/" class="list-group-item list-group-item-action">
+                            <i class="fas fa-file-alt me-2"></i>Manage Submissions
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-database"></i> Database Management</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="/admin/fees/" class="list-group-item list-group-item-action">
+                            <i class="fas fa-dollar-sign me-2"></i>Fee Management System
+                        </a>
+                        <a href="/admin/employees/" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user-tie me-2"></i>Employee Management
+                        </a>
+                        <a href="/admin/accounts/" class="list-group-item list-group-item-action">
+                            <i class="fas fa-id-card me-2"></i>Account Management
+                        </a>
+                        <a href="/admin/auth/group/" class="list-group-item list-group-item-action">
+                            <i class="fas fa-users-cog me-2"></i>Permissions & Groups
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Emergency Actions</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>System Administrator Capabilities:</strong></p>
+                    <ul>
+                        <li>Reset any user password</li>
+                        <li>Delete or modify any data</li>
+                        <li>Access all system features</li>
+                        <li>Override all permissions</li>
+                        <li>View and edit database directly</li>
+                        <li>Manage system settings</li>
+                    </ul>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Use these powers responsibly. All actions are logged.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - School Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-user-plus me-2"></i>{{ title }}</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'fees:dashboard' %}">Fee Management</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'fees:student_list' %}">Students</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Please use the Admin Panel to add/edit students: <a href="/admin/fees/student/" class="alert-link">Go to Admin Panel</a>
+            </div>
+            <p class="text-muted">Student management is currently available through the Django admin interface for better data validation and security.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

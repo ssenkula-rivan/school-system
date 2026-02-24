@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Performance Reviews - School Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-star me-2"></i>Performance Reviews</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'employees:dashboard' %}">Staff Management</a></li>
+                    <li class="breadcrumb-item active">Performance Reviews</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Filter by Employee</label>
+                            <select name="employee" class="form-select">
+                                <option value="">All Employees</option>
+                                {% for emp in employees %}
+                                    <option value="{{ emp.id }}" {% if employee_filter == emp.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ emp.user.get_full_name }} ({{ emp.employee_id }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter me-2"></i>Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Performance Review Records</h5>
+                </div>
+                <div class="card-body">
+                    {% if page_obj %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Review Period</th>
+                                        <th>Reviewer</th>
+                                        <th>Overall Rating</th>
+                                        <th>Average Score</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for review in page_obj %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ review.employee.user.get_full_name }}</strong>
+                                            <br><small class="text-muted">{{ review.employee.employee_id }}</small>
+                                        </td>
+                                        <td>
+                                            {{ review.review_period_start|date:"M d, Y" }}
+                                            <br>to<br>
+                                            {{ review.review_period_end|date:"M d, Y" }}
+                                        </td>
+                                        <td>{{ review.reviewer.get_full_name }}</td>
+                                        <td>
+                                            {% if review.overall_rating == 5 %}
+                                                <span class="badge bg-success">Excellent</span>
+                                            {% elif review.overall_rating == 4 %}
+                                                <span class="badge bg-info">Good</span>
+                                            {% elif review.overall_rating == 3 %}
+                                                <span class="badge bg-warning">Average</span>
+                                            {% elif review.overall_rating == 2 %}
+                                                <span class="badge bg-danger">Below Average</span>
+                                            {% else %}
+                                                <span class="badge bg-dark">Poor</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <strong>{{ review.average_rating|floatformat:1 }}/5.0</strong>
+                                            <div class="progress" style="height: 5px;">
+                                                <div class="progress-bar" role="progressbar" style="width: {{ review.average_rating|floatformat:0|add:"0" }}0%"></div>
+                                            </div>
+                                        </td>
+                                        <td>{{ review.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#reviewModal{{ review.id }}">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Review Detail Modal -->
+                                    <div class="modal fade" id="reviewModal{{ review.id }}" tabindex="-1">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Performance Review Details</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h6>Employee: {{ review.employee.user.get_full_name }}</h6>
+                                                    <p class="text-muted">Review Period: {{ review.review_period_start|date:"M d, Y" }} - {{ review.review_period_end|date:"M d, Y" }}</p>
+                                                    
+                                                    <hr>
+                                                    
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <strong>Overall Rating:</strong> {{ review.overall_rating }}/5
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <strong>Goals Achievement:</strong> {{ review.goals_achievement }}/5
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <strong>Communication:</strong> {{ review.communication }}/5
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <strong>Teamwork:</strong> {{ review.teamwork }}/5
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <strong>Technical Skills:</strong> {{ review.technical_skills }}/5
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <strong>Average Score:</strong> {{ review.average_rating|floatformat:1 }}/5
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <hr>
+                                                    
+                                                    <div class="mb-3">
+                                                        <strong>Comments:</strong>
+                                                        <p class="border p-3 rounded bg-light">{{ review.comments }}</p>
+                                                    </div>
+                                                    
+                                                    {% if review.recommendations %}
+                                                    <div class="mb-3">
+                                                        <strong>Recommendations:</strong>
+                                                        <p class="border p-3 rounded bg-light">{{ review.recommendations }}</p>
+                                                    </div>
+                                                    {% endif %}
+                                                    
+                                                    <p class="text-muted small">Reviewed by: {{ review.reviewer.get_full_name }} on {{ review.created_at|date:"M d, Y" }}</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        {% if page_obj.has_other_pages %}
+                        <nav>
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if employee_filter %}&employee={{ employee_filter }}{% endif %}">Previous</a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for num in page_obj.paginator.page_range %}
+                                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                        <a class="page-link" href="?page={{ num }}{% if employee_filter %}&employee={{ employee_filter }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if employee_filter %}&employee={{ employee_filter }}{% endif %}">Next</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-star fa-4x text-muted mb-3"></i>
+                            <p class="text-muted">No performance reviews found</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
