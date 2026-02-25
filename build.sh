@@ -8,26 +8,4 @@ python manage.py collectstatic --no-input
 python manage.py migrate
 
 # Create superuser if it doesn't exist
-python manage.py shell << EOF
-from django.contrib.auth import get_user_model
-from accounts.models import UserProfile
-
-User = get_user_model()
-if not User.objects.filter(username='admin').exists():
-    user = User.objects.create_superuser(
-        username='admin',
-        email='cranictech@elincorporatedlimited.com',
-        password='Admin@2024',
-        first_name='System',
-        last_name='Administrator'
-    )
-    UserProfile.objects.create(
-        user=user,
-        employee_id='ADMIN001',
-        role='admin',
-        is_active_employee=True
-    )
-    print('Superuser created successfully!')
-else:
-    print('Superuser already exists')
-EOF
+echo "from django.contrib.auth import get_user_model; from accounts.models import UserProfile; User = get_user_model(); user = User.objects.create_superuser(username='admin', email='cranictech@elincorporatedlimited.com', password='Admin@2024', first_name='System', last_name='Administrator') if not User.objects.filter(username='admin').exists() else None; UserProfile.objects.create(user=User.objects.get(username='admin'), employee_id='ADMIN001', role='admin', is_active_employee=True) if user and not UserProfile.objects.filter(user__username='admin').exists() else None; print('Setup complete!')" | python manage.py shell

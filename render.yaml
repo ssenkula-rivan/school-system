@@ -1,37 +1,28 @@
-databases:
-  - name: school_db
-    databaseName: school_management
-    user: school_user
-
 services:
   - type: web
     name: school-management-system
     runtime: python
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn workplace_system.wsgi:application --bind 0.0.0.0:$PORT"
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate"
+    startCommand: "gunicorn workplace_system.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
-      - key: DATABASE_URL
-        fromDatabase:
-          name: school_db
-          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
-        value: False
+        value: "True"
       - key: ALLOWED_HOSTS
-        value: school-management-system-vipe.onrender.com,.onrender.com,localhost
+        value: "*"
       - key: EMAIL_BACKEND
         value: django.core.mail.backends.smtp.EmailBackend
       - key: EMAIL_HOST
         value: mail.privateemail.com
       - key: EMAIL_PORT
-        value: 465
+        value: "465"
       - key: EMAIL_USE_SSL
-        value: True
+        value: "True"
       - key: EMAIL_USE_TLS
-        value: False
+        value: "False"
       - key: EMAIL_HOST_USER
         value: cranictech@elincorporatedlimited.com
       - key: EMAIL_HOST_PASSWORD
