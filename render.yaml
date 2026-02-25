@@ -21,4 +21,20 @@ services:
       - key: DEBUG
         value: False
       - key: ALLOWED_HOSTS
-        sync: false
+        value: school-management-system-vipe.onrender.com,.onrender.com,localhost
+      - key: EMAIL_BACKEND
+        value: django.core.mail.backends.smtp.EmailBackend
+      - key: EMAIL_HOST
+        value: mail.privateemail.com
+      - key: EMAIL_PORT
+        value: 465
+      - key: EMAIL_USE_SSL
+        value: True
+      - key: EMAIL_USE_TLS
+        value: False
+      - key: EMAIL_HOST_USER
+        value: cranictech@elincorporatedlimited.com
+      - key: EMAIL_HOST_PASSWORD
+        value: Happylife227.#
+      - key: DEFAULT_FROM_EMAIL
+        value: cranictech@elincorporatedlimited.com
