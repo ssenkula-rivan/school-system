@@ -239,7 +239,7 @@ if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
 # CSRF_COOKIE_SECURE = True
 
 # Database Query Optimization
-# Logging slow queries for optimization
+# Logging configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -250,14 +250,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
-            'maxBytes': 1024 * 1024 * 10,  # 10 MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
@@ -266,13 +258,13 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
         },
         'django.db.backends': {
-            'handlers': ['file'],
-            'level': 'WARNING',  # Set to DEBUG to log all queries
+            'handlers': ['console'],
+            'level': 'WARNING',
             'propagate': False,
         },
     },
